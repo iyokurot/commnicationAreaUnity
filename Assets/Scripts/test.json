@@ -1,0 +1,12 @@
+{
+  "users": [
+    { "id": 2, "pos_x": 1, "pos_z": 2 },
+    { "id": "Hbm8gT56CbqRVLOTAAAA", "pos_x": -1.888749, "pos_z": 1.689833 },
+    { "id": "DfI9tBqGvKdA2uI7AAAB", "pos_x": 0, "pos_z": 0 },
+    { "id": "Kk_YjAXLs9fDYNqHAAAC", "pos_x": 0, "pos_z": 0 },
+    { "id": "16kYmoj6JYlPb39EAAAD", "pos_x": 0, "pos_z": 0 },
+    { "id": "AaQIyFXrlz0FfC5dAAAE", "pos_x": -3.205199, "pos_z": 3.476673 },
+    { "id": "cUc9dtVQGRqdXtqsAAAF", "pos_x": 0, "pos_z": 0 },
+    { "id": "seA_dXKGYZCPJ18ZAAAG", "pos_x": 0, "pos_z": 0 }
+  ]
+}
