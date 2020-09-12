@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using SocketIO;
 using UnityEngine;
@@ -7,7 +7,7 @@ public class SocketClient : SingletonMonoBehaviourFast<SocketClient> {
     SocketIOComponent socket;
     [SerializeField]
     GameObject playerObject = default;
-    private Dictionary<string, GameObject> playerTable = new Dictionary<string, GameObject> ();
+    private Dictionary<string, CharaController> playerTable = new Dictionary<string, CharaController> ();
 
     public void Start () {
         GameObject go = GameObject.Find ("SocketIO");
@@ -58,7 +58,7 @@ public class SocketClient : SingletonMonoBehaviourFast<SocketClient> {
         // 配列へ追加
         GameObject obj = Instantiate (playerObject, new Vector3 (0, playerObject.transform.position.y, 0), playerObject.transform.rotation);
         // Dictionaryに追加
-        playerTable.Add (id, obj);
+        playerTable.Add (id, obj.GetComponent<CharaController>());
 
         Debug.Log ("online id: " + id);
     }
@@ -67,7 +67,8 @@ public class SocketClient : SingletonMonoBehaviourFast<SocketClient> {
         string id = e.data.GetField ("id").str;
         // 対象ユーザをDestroy
         if (playerTable.ContainsKey (id)) {
-            Destroy (playerTable[id]);
+            //Destroy (playerTable[id]);
+            playerTable[id].DestroyObject();
             playerTable.Remove (id);
         }
         Debug.Log ("offline id: " + id);
@@ -82,7 +83,7 @@ public class SocketClient : SingletonMonoBehaviourFast<SocketClient> {
         foreach (var user in users.users) {
             GameObject obj = Instantiate (playerObject, new Vector3 (user.pos_x, playerObject.transform.position.y, user.pos_z), playerObject.transform.rotation);
             // Dictionaryに追加
-            playerTable.Add (user.id, obj);
+            playerTable.Add (user.id, obj.GetComponent<CharaController>());
         }
 
         Debug.Log ("message id: " + id + " message: " + message);
@@ -93,6 +94,12 @@ public class SocketClient : SingletonMonoBehaviourFast<SocketClient> {
 
         string id = obj.GetField ("id").str;
         string message = obj.GetField ("message").str;
+        foreach (KeyValuePair<string, CharaController> kvp in playerTable) {
+            if (kvp.Key == id) {
+                kvp.Value.Remark(message);
+                break;
+            }
+        }
 
         Debug.Log ("message id: " + id + " message: " + message);
     }
@@ -104,12 +111,13 @@ public class SocketClient : SingletonMonoBehaviourFast<SocketClient> {
         float pos_z = obj.GetField ("z").n;
 
         // 対象ユーザを探索し位置更新
-        foreach (KeyValuePair<string, GameObject> kvp in playerTable) {
+        foreach (KeyValuePair<string, CharaController> kvp in playerTable) {
             if (kvp.Key == id) {
-                Vector3 pos = kvp.Value.transform.position;
-                pos.x = pos_x;
-                pos.z = pos_z;
-                kvp.Value.transform.position = pos;
+                // Vector3 pos = kvp.Value.transform.position;
+                // pos.x = pos_x;
+                // pos.z = pos_z;
+                // kvp.Value.transform.position = pos;
+                kvp.Value.Move(pos_x,pos_z);
                 break;
             }
         }
@@ -120,8 +128,6 @@ public class SocketClient : SingletonMonoBehaviourFast<SocketClient> {
     public void EmitMessage (string message) {
         JSONObject jsonObject = new JSONObject (JSONObject.Type.OBJECT);
         jsonObject.AddField ("message", message);
-        jsonObject.AddField ("x", this.transform.position.x);
-        jsonObject.AddField ("y", this.transform.position.y);
 
         socket.Emit ("message", jsonObject);
     }
